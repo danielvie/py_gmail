@@ -81,7 +81,7 @@ class Gmail():
         
 
     def get_message_details(self, message_id):
-        msg = app.service.users().messages().get(userId='me', id=message_id).execute()
+        msg = self.service.users().messages().get(userId='me', id=message_id).execute()
         headers = msg['payload']['headers']
 
         subject = next((header['value'] for header in headers if header['name'] == 'Subject'), None)
@@ -92,30 +92,35 @@ class Gmail():
         items_with_from = " ".join([f"from:'{i}'" for i in app.items])
         return f'{{{items_with_from}}}'
 
+    def get_messages(self):
+        value = self.get_first_query()
+        yield self.query(value)
+        
+        while True:
+            value = input("\nEnter a string value to search for in message titles/subjects or 'exit' to quit: ")
+
+            # Exit condition
+            if not value or value.lower() == 'exit':
+                break
+
+            yield self.query(value)
+        
+        print('ending of queries!!!')
+        
+    def mark_as_read(self, msg):
+        self.service.users().messages().modify(userId='me', id=msg, body={'removeLabelIds': ['UNREAD']}).execute()
+
+    def mark_as_arquived(self, msg):
+        self.service.users().messages().modify(userId='me', id=msg, body={'removeLabelIds': ['INBOX']}).execute()
+
     def __del__(self) -> None:
         print('destructor')
 
 
 app = Gmail()
 
-q = app.get_first_query()
-
-while True:
+for found_messages in app.get_messages():
     
-    if not q:
-        value = input("\nEnter a string value to search for in message titles/subjects or 'exit' to quit: ")
-    else:
-        value = q
-        q = ""
-
-    # Exit condition
-    if not value or value.lower() == 'exit':
-        break
-
-    # Searching messages based on the value in INBOX
-    # found_messages = search_messages(f'subject:{value} OR from:{value}')
-    found_messages = app.query(value)
-
     if not found_messages:
         print("No messages found in INBOX.")
         continue
@@ -146,16 +151,14 @@ while True:
             count_messages += 1
             print(m)
 
-
     choice = input(f"\nDo you want to mark these ({count_messages}) as read and archive them? (yes/No): ").strip().lower()
     
     if choice == 'yes' or choice == 'y':
         for message, action in zip(found_messages, action):
             if action == 1:
                 # Mark as read
-                app.service.users().messages().modify(userId='me', id=message['id'], body={'removeLabelIds': ['UNREAD']}).execute()
+                app.mark_as_read(message['id'])
                 # Archive
-                app.service.users().messages().modify(userId='me', id=message['id'], body={'removeLabelIds': ['INBOX']}).execute()
+                app.mark_as_arquived(message['id'])
 
         print("Messages have been marked as read and archived.")
-        
