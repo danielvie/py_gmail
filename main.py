@@ -10,54 +10,6 @@ import os
 import tempfile
 
 
-# Set up the Gmail API
-SCOPES = ['https://www.googleapis.com/auth/gmail.modify']
-
-creds = None
-
-# token.pickle stores the users access
-if os.path.exists('token.pickle'):
-    with open('token.pickle', 'rb') as token:
-        creds = pickle.load(token)
-
-# if there are no valid credentials, let the user log in
-if not creds or not creds.valid:
-    if creds and creds.expired and creds.refresh_token:
-        creds.refresh(Request())
-    else:
-        flow = InstalledAppFlow.from_client_secrets_file('credential.json', SCOPES)
-        creds = flow.run_local_server(port=0)
-        with open('token.pickle', 'wb') as token:
-            # service = build('gmail', 'v1', credentials=creds)
-            pickle.dump(creds, token)
-
-service = build('gmail', 'v1', credentials=creds)
-
-def search_messages(query:str):
-    
-    if query.lower() == 'inbox':
-        print(f'query inbox')
-        results = service.users().messages().list(userId='me', labelIds=['INBOX']).execute()
-        return results.get('messages', [])
-
-    if query.lower() == 'unread':
-        print(f'query unread')
-        results = service.users().messages().list(userId='me', labelIds=['UNREAD']).execute()
-        return results.get('messages', [])
-
-    print(f'query: {query}')
-    results = service.users().messages().list(userId='me', q=query, labelIds=['INBOX']).execute()
-    return results.get('messages', [])
-
-
-def get_message_details(message_id):
-    msg = service.users().messages().get(userId='me', id=message_id).execute()
-    headers = msg['payload']['headers']
-
-    subject = next((header['value'] for header in headers if header['name'] == 'Subject'), None)
-    sender = next((header['value'] for header in headers if header['name'] == 'From'), None)
-    return sender, subject
-
 def call_vim(temp_message:str) -> str:
     # create a temporary file
     with tempfile.NamedTemporaryFile(suffix=".tmp", delete=False, mode="w") as tf:
@@ -80,38 +32,81 @@ def call_vim(temp_message:str) -> str:
 
     return content
 
-def get_email_position(content):
-    res = []
-    for msg in content.split("\n"):
-        if match := re.match('(?P<type>^\w)\s+(?P<message>.*)', msg):
-            values = match.groupdict()
-            res.append(int(values['type']))
+class Gmail():
+    SCOPES = ['https://www.googleapis.com/auth/gmail.modify']
+    creds = None
+    service = None
+    items = []
+    q:str = None
     
-    return res
+    def __init__(self) -> None:
+        # get token from previous session
+        if os.path.exists('token.pickle'):
+            with open ('token.pickle', 'rb') as token:
+                self.creds = pickle.load(token)
+                
+        # ask login if there is no token
+        if not self.creds or not self.creds.valid:
+            self.creds.refresh(Request())
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file('credential.json', self.SCOPES)
+            self.creds = flow.run_local_server(port=0)
+            with open('open.pickle', 'wb') as token:
+                pickle.dump(self.creds, token)
+            
+        self.service = build('gmail', 'v1', credentials=self.creds)
+        
+        # get list of queries
+        file = "query_list.txt"
+        
+        with open(file, "r") as f:
+            while l := f.readline():
+                self.items.append(l.replace("\n", ""))
 
-# first try
-items = ["DHL Parcel", "Coursera", "#WeAreSST", "Nubank", "Pathé", "Airalo", "Twitch", "Costa Cruzeiros", 
-         "Ryanair", "ADPList", "Bowl", "SNCF", "reclameaqui", "thuisbezorgd", "microsoft",
-         "mathworks", "disney", "swapfiets", "chessly", "thalys", "nubank", "trivago", "grammarly",
-         "nuinvest", "renpho", "seedtable", "nordvpn", "meetup", "shaping", "trek", "prime", "nomad",
-         "latam", "estadao", "medium", "duolingo", "modular", "ninjatrader", "ptc.com", "nvidia",
-         "codesandbox", "fusion 360", "paris 2024", "crosshill", "valor.com.br", "bol.com", "nelogica",
-         "skillshare", "threejs", "linkedin", "adidas", "splitwise", "eurostar", "lego", "masterclass", 
-         "leetcode", "strava", "flixbus"]
 
-# adding `from:` to itens
-items_from = " ".join([f"from:'{i}'" for i in items])
+    def query(self, qry:str):
+        if qry.lower() == 'inbox':
+            print(f'query inbox')
+            results = self.service.users().messages().list(userId='me', labelIds=['INBOX']).execute()
+            return results.get('messages', [])
 
-query = f'{{{items_from}}}'
-# print(query)
+        if qry.lower() == 'unread':
+            print(f'query unread')
+            results = self.service.users().messages().list(userId='me', labelIds=['UNREAD']).execute()
+            return results.get('messages', [])
+
+        print(f'query: {qry}')
+        results = self.service.users().messages().list(userId='me', q=qry, labelIds=['INBOX']).execute()
+        return results.get('messages', [])
+        
+
+    def get_message_details(self, message_id):
+        msg = app.service.users().messages().get(userId='me', id=message_id).execute()
+        headers = msg['payload']['headers']
+
+        subject = next((header['value'] for header in headers if header['name'] == 'Subject'), None)
+        sender = next((header['value'] for header in headers if header['name'] == 'From'), None)
+        return sender, subject
+
+    def get_first_query(self):
+        items_with_from = " ".join([f"from:'{i}'" for i in app.items])
+        return f'{{{items_with_from}}}'
+
+    def __del__(self) -> None:
+        print('destructor')
+
+
+app = Gmail()
+
+q = app.get_first_query()
 
 while True:
     
-    if not query:
+    if not q:
         value = input("\nEnter a string value to search for in message titles/subjects or 'exit' to quit: ")
     else:
-        value = query
-        query = ""
+        value = q
+        q = ""
 
     # Exit condition
     if not value or value.lower() == 'exit':
@@ -119,19 +114,18 @@ while True:
 
     # Searching messages based on the value in INBOX
     # found_messages = search_messages(f'subject:{value} OR from:{value}')
-    found_messages = search_messages(value)
+    found_messages = app.query(value)
 
     if not found_messages:
         print("No messages found in INBOX.")
         continue
-
 
     temp_message:str = "" 
 
     print("\nFound Messages:")
     messages_list = []
     for m in found_messages:
-        sender, subject = get_message_details(m['id'])
+        sender, subject = app.get_message_details(m['id'])
         # print(f"Sender: {sender} | Subject: {subject}")
         mi = f"{sender} | Subject: {subject}"
         temp_message += f"remove {mi}\n"
@@ -159,9 +153,9 @@ while True:
         for message, action in zip(found_messages, action):
             if action == 1:
                 # Mark as read
-                service.users().messages().modify(userId='me', id=message['id'], body={'removeLabelIds': ['UNREAD']}).execute()
+                app.service.users().messages().modify(userId='me', id=message['id'], body={'removeLabelIds': ['UNREAD']}).execute()
                 # Archive
-                service.users().messages().modify(userId='me', id=message['id'], body={'removeLabelIds': ['INBOX']}).execute()
+                app.service.users().messages().modify(userId='me', id=message['id'], body={'removeLabelIds': ['INBOX']}).execute()
 
         print("Messages have been marked as read and archived.")
         

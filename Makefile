@@ -1,4 +1,5 @@
-all: e
+all: r
+# all: e
 # all: raii
 
 raii:
