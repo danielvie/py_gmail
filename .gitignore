@@ -2,3 +2,4 @@ build
 dist
 token.pickle
 myscript.spec
+__pycache__

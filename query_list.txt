@@ -10,6 +10,8 @@
 "Coursera"
 "crosshill"
 "DHL Parcel"
+"Amazon.nl"
+"disney"
 "disney"
 "duolingo"
 "estadao"

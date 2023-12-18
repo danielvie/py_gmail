@@ -1,9 +1,9 @@
 all: r
 # all: e
-# all: raii
+# all: play
 
-raii:
-	python bla.py
+play:
+	python play.py
 
 r:
 	python main.py
