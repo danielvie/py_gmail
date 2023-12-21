@@ -1,7 +1,12 @@
 """program to read emails and archive them"""
 
 import pickle
+
+import re
 import os
+import os.path
+import tempfile
+
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from google.auth.transport.requests import Request
@@ -11,9 +16,30 @@ from prompt_toolkit.history import InMemoryHistory
 from rich.console import Console
 from rich.progress import track
 
+
 history = InMemoryHistory()
 session = PromptSession(history=history)
 console = Console()
+
+
+def call_vim(message: str) -> str:
+    """Function that calls vim to edit messages"""
+    # create a temporary file
+    with tempfile.NamedTemporaryFile(suffix=".tmp", delete=False, mode="w") as tf:
+        tf.write(message)
+        temp_file_name = tf.name
+
+    # open the temporary file with vim
+    os.system(f"v {temp_file_name}")
+
+    # read the contents of the temporary file
+    with open(temp_file_name, "r", encoding="utf-8") as tf:
+        res = tf.read()
+
+    # delete the temporary file
+    os.remove(temp_file_name)
+
+    return res
 
 
 class Gmail:
@@ -25,6 +51,7 @@ class Gmail:
     items = []
     test: bool = False
     msgid = {}
+    query_history = set()
 
     def __init__(self) -> None:
         # get token from previous session
@@ -69,6 +96,7 @@ class Gmail:
 
     def query(self, qry: str):
         """calls a query for messages in gmail"""
+
         if qry.lower() == "inbox":
             print("query inbox")
             results = (
@@ -151,6 +179,29 @@ class Gmail:
                 yield self.query(self.get_first_query())
                 continue
 
+            if value == "e":
+                print("eu deveria editar algo aqui")
+                print(self.query_history)
+
+                with open("query_list.txt", "r", encoding="utf-8") as f:
+                    temp_message = "--new values--\n"
+                    temp_message += "\n".join(f'"{q}"' for q in self.query_history)
+
+                    temp_message += "\n--end new values--\n"
+                    temp_message += f.read()
+
+                    res = call_vim(temp_message)
+
+                    new_file = "\n".join(
+                        filter(lambda x: not re.match(r"^--.+--$", x), res.split("\n"))
+                    )
+
+                with open("query_list.txt", "w", encoding="utf-8") as f:
+                    f.write(new_file)
+
+                continue
+
+            self.query_history.add(value)
             yield self.query(value)
 
         print("\n")

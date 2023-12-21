@@ -1,34 +1,82 @@
 """Program to read emails and archive them"""
 
-import os.path
-import os
-import tempfile
-
-from gmail import Gmail
-
-
-def call_vim(message: str) -> str:
-    """Function that calls vim to edit messages"""
-    # create a temporary file
-    with tempfile.NamedTemporaryFile(suffix=".tmp", delete=False, mode="w") as tf:
-        tf.write(message)
-        temp_file_name = tf.name
-
-    # open the temporary file with vim
-    os.system(f"v {temp_file_name}")
-
-    # read the contents of the temporary file
-    with open(temp_file_name, "r", encoding="utf-8") as tf:
-        res = tf.read()
-
-    # delete the temporary file
-    os.remove(temp_file_name)
-
-    return res
-
+from gmail import Gmail, call_vim
 
 app = Gmail()
 app.in_test(False)
+
+
+val = [
+    "--new values--",
+    '"bla"',
+    '"ble"',
+    "--end new values--",
+    '"#WeAreSST"',
+    '"nederlandse"',
+    '"dhl"',
+    '"adidas"',
+    '"flying blue"',
+    '"ADPList"',
+    '"Airalo"',
+    '"bol.com"',
+    '"Bowl"',
+    '"chessly"',
+    '"chess"',
+    '"codesandbox"',
+    '"Costa Cruzeiros"',
+    '"Coursera"',
+    '"crosshill"',
+    '"DHL Parcel"',
+    '"Amazon.nl"',
+    '"disney"',
+    '"disney"',
+    '"duolingo"',
+    '"estadao"',
+    '"eurostar"',
+    '"flixbus"',
+    '"fusion 360"',
+    '"grammarly"',
+    '"latam"',
+    '"leetcode"',
+    '"lego"',
+    '"linkedin"',
+    '"masterclass"',
+    '"mathworks"',
+    '"medium"',
+    '"meetup"',
+    '"microsoft"',
+    '"modular"',
+    '"nelogica"',
+    '"ninjatrader"',
+    '"nomad"',
+    '"nordvpn"',
+    '"Nubank"',
+    '"nubank"',
+    '"nuinvest"',
+    '"nvidia"',
+    '"paris 2024"',
+    '"Pathé"',
+    '"prime"',
+    '"ptc.com"',
+    '"reclameaqui"',
+    '"renpho"',
+    '"Ryanair"',
+    '"seedtable"',
+    '"shaping"',
+    '"skillshare"',
+    '"SNCF"',
+    '"splitwise"',
+    '"strava"',
+    '"swapfiets"',
+    '"thalys"',
+    '"threejs"',
+    '"thuisbezorgd"',
+    '"trek"',
+    '"trivago"',
+    '"Twitch"',
+    '"valor.com.br"',
+]
+
 
 for found_messages in app.get_messages():
     if not found_messages:
