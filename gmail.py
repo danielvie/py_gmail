@@ -180,9 +180,7 @@ class Gmail:
                 continue
 
             if value == "e":
-                print("eu deveria editar algo aqui")
-                print(self.query_history)
-
+                # edit list os qry items
                 with open("query_list.txt", "r", encoding="utf-8") as f:
                     temp_message = "--new values--\n"
                     temp_message += "\n".join(f'"{q}"' for q in self.query_history)
