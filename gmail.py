@@ -199,6 +199,7 @@ class Gmail:
 
                 with open("query_list.txt", "w", encoding="utf-8") as f:
                     f.write("\n".join(unique_sorted_values))
+                    self.query_history.clear()
 
                 continue
 
