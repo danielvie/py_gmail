@@ -1,5 +1,6 @@
 build
 dist
-token.pickle
 myscript.spec
+.DS_Store
+*.pickle
 __pycache__
