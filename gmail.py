@@ -192,12 +192,15 @@ class Gmail:
 
                     res = call_vim(temp_message)
 
-                    new_file = "\n".join(
-                        filter(lambda x: not re.match(r"^--.+--$", x), res.split("\n"))
+                    # filtering and sorting unique the values
+                    filtered_values = filter(
+                        lambda x: not re.match(r"^--.+--$", x) and x.strip(),
+                        res.split("\n"),
                     )
+                    unique_sorted_values = sorted(set(filtered_values))
 
                 with open("query_list.txt", "w", encoding="utf-8") as f:
-                    f.write(new_file)
+                    f.write("\n".join(unique_sorted_values))
 
                 continue
 
