@@ -117,7 +117,6 @@ class Gmail:
             )
             return results.get("messages", [])
 
-        print(f"query: {qry}")
         results = (
             self.service.users()
             .messages()
