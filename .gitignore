@@ -4,3 +4,4 @@ myscript.spec
 .DS_Store
 *.pickle
 __pycache__
+credential.json
