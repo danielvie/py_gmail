@@ -6,7 +6,7 @@ play:
 	python play.py
 
 r:
-	python main.py
+	. .venv/bin/activate && python main.py
 	
 t:
 	python test.py
@@ -23,3 +23,4 @@ b:
 
 e:
 	./dist/main
+
