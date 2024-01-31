@@ -2,6 +2,9 @@ build
 dist
 myscript.spec
 .DS_Store
+
 *.pickle
+*.exe
+
 __pycache__
 credential.json
