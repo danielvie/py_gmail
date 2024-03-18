@@ -9,7 +9,7 @@ r:
 	. .venv/bin/activate && python main.py
 	
 t:
-	python test.py
+	. .venv/bin/activate && python main.py --test
 	
 res: clean
 
