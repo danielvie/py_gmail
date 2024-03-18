@@ -15,6 +15,8 @@ res: clean
 
 c: clean
 
+clear: clean
+
 clean:
 	rm token.pickle
 	

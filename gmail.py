@@ -25,7 +25,9 @@ console = Console()
 def call_vim(message: str) -> str:
     """Function that calls vim to edit messages"""
     # create a temporary file
-    with tempfile.NamedTemporaryFile(suffix=".tmp", delete=False, mode="w", encoding="utf-8") as tf:
+    with tempfile.NamedTemporaryFile(
+        suffix=".tmp", delete=False, mode="w", encoding="utf-8"
+    ) as tf:
         tf.write(message)
         temp_file_name = tf.name
 
@@ -77,8 +79,8 @@ class Gmail:
         file = "query_list.txt"
 
         with open(file, "r", encoding="utf-8") as f:
-            while l := f.readline():
-                self.items.append(l.replace("\n", ""))
+            while line := f.readline():
+                self.items.append(line.replace("\n", ""))
 
     def in_test(self, value):
         """sets module to test mode"""

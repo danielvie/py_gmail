@@ -3,7 +3,7 @@
 from gmail import Gmail, call_vim
 
 app = Gmail()
-app.in_test(False)
+app.in_test(True)
 
 for found_messages in app.get_messages():
     if not found_messages:
