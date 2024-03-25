@@ -16,10 +16,10 @@ def main(in_test=False):
 
         temp_message: str = ""
         for i, m in enumerate(found_messages):
-            sender, subject = app.get_message_details(m["id"])
+            sender, subject, date = app.get_message_details(m["id"])
 
             subject = subject.replace("\n", "")
-            mi = f"{i+1}: {sender} | {subject} | {m['id']}"
+            mi = f"{i+1}: {sender} | {subject} | ({date}) | {m['id']}"
             temp_message += f"{mi}\n"
 
         content = call_vim(temp_message)

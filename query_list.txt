@@ -33,6 +33,7 @@
 "deporvillage"
 "dhl"
 "disney"
+"dji"
 "dotz"
 "doutorado"
 "dpd"

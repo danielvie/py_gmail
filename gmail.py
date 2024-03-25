@@ -16,6 +16,7 @@ from prompt_toolkit.history import InMemoryHistory
 from rich.console import Console
 from rich.progress import track
 
+from email.utils import parsedate_to_datetime
 
 history = InMemoryHistory()
 session = PromptSession(history=history)
@@ -143,7 +144,14 @@ class Gmail:
         sender = next(
             (header["value"] for header in headers if header["name"] == "From"), None
         )
-        return sender, subject
+        date = next(
+            (header["value"] for header in headers if header["name"] == "Date"), None
+        )
+
+        if date is not None:
+            date = parsedate_to_datetime(date).strftime("%d-%m-%Y %H:%M")
+
+        return sender, subject, date
 
     def get_first_query(self):
         """get the query using `query_list.txt` values"""
