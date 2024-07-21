@@ -2,6 +2,8 @@ build
 dist
 myscript.spec
 .DS_Store
+.venv/
+runwin.cmd
 
 
 *.pickle

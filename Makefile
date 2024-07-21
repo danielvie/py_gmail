@@ -1,12 +1,15 @@
-all: r
+all: rw
 # all: e
 # all: play
 
 play:
 	python play.py
 
+rw:
+	./.venv/Scripts/activate && python main.py
+
 r:
-	. .venv/bin/activate && python main.py
+	python main.py
 	
 t:
 	. .venv/bin/activate && python main.py --test
