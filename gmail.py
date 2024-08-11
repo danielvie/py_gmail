@@ -6,6 +6,7 @@ import re
 import os
 import os.path
 import tempfile
+from typing import Optional, Tuple
 
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
@@ -133,7 +134,7 @@ class Gmail:
 
         return messages
 
-    def get_message_details(self, message_id):
+    def get_message_details(self, message_id) -> Tuple[str, str, str]:
         """get details from message from id"""
         msg = self.service.users().messages().get(userId="me", id=message_id).execute()
         headers = msg["payload"]["headers"]
