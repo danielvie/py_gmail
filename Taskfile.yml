@@ -1,0 +1,19 @@
+version: '3'
+
+tasks:
+  default:
+    deps:
+      - run_windows
+  run:
+    cmds:
+      - python main.py
+  
+  run_windows:
+    cmds:
+      - powershell ./.venv/Scripts/activate; python main.py
+
+  clean:
+    aliases:
+      - c
+    cmds:
+      - rm main.py
