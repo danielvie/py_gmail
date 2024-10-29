@@ -4,9 +4,6 @@ tasks:
   default:
     deps:
       - run_windows
-  run:
-    cmds:
-      - python main.py
   
   run_windows:
     cmds:
@@ -16,4 +13,4 @@ tasks:
     aliases:
       - c
     cmds:
-      - rm main.py
+      - rm token.pickle
