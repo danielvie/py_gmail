@@ -7,7 +7,7 @@ tasks:
   
   run_windows:
     cmds:
-      - powershell ./.venv/Scripts/activate; python main.py
+      - powershell ./.venv/Scripts/activate; python -m pygmail.main
 
   clean:
     aliases:

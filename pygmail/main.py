@@ -1,7 +1,8 @@
 """Program to read emails and archive them"""
 
 import sys
-from gmail import Gmail, call_vim
+import os
+from pygmail.gmail import Gmail, call_vim
 
 
 def main(in_test=False):
@@ -53,4 +54,13 @@ if __name__ == "__main__":
     # read parameters from file call
     IN_TEST = "--test" in sys.argv
 
-    main(in_test=IN_TEST)
+    try:
+        main(in_test=IN_TEST)
+    except FileNotFoundError as e:
+        print(e)
+        print('\nHow to fix this:\n')
+        print('1. goto https://console.cloud.google.com/apis/credentials')
+        print(f'2. put the file in `{os.getcwd()}`')
+        print('3. rename it to `credential.json`')
+    except Exception as e:
+        print(f'error: {e}')
