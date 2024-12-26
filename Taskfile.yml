@@ -2,15 +2,11 @@ version: '3'
 
 tasks:
   default:
-    deps: [run-windows]
+    deps: [run]
 
-  run-windows:
+  run:
     cmds:
-      - powershell ./.venv/Scripts/activate; python -m pygmail.main
-
-  run-unix:
-    cmds:
-      - ./.venv/Scripts/activate & python -m pygmail.main
+      - uv run -m pygmail.main
 
   clean:
     aliases:
