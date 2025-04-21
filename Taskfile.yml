@@ -12,4 +12,4 @@ tasks:
     aliases:
       - c
     cmds:
-      - rm token.pickle
+      - powershell rm token.pickle

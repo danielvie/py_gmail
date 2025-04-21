@@ -238,13 +238,22 @@ class Gmail:
             userId="me", id=msg_id, body={"removeLabelIds": ["INBOX"]}
         ).execute()
 
+    def mark_as_read_and_arquived(self, msg_id):
+        """remove label inbox from message"""
+        if self.test:
+            _, subject = self.get_message_details(msg_id)
+            console.print(f"\n[blue]mark arquived for[/blue]: {subject}")
+            return
+
+        self.service.users().messages().modify(
+            userId="me", id=msg_id, body={"removeLabelIds": ["UNREAD", "INBOX"]}
+        ).execute()
+
+
     def remove_messages(self, ids):
         """call all methods to remove messages"""
         for m_id in track(ids, description="processing... "):
-            # Mark as read
-            self.mark_as_read(m_id)
-            # Archive
-            self.mark_as_arquived(m_id)
+            self.mark_as_read_and_arquived(m_id)
 
     def __del__(self) -> None:
         pass

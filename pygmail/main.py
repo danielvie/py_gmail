@@ -60,7 +60,6 @@ if __name__ == "__main__":
         print(e)
         print('\nHow to fix this:\n')
         print('1. goto https://console.cloud.google.com/apis/credentials')
-        print(f'2. put the file in `{os.getcwd()}`')
-        print('3. rename it to `credential.json`')
+        print(f'2. put the file in `{os.getcwd()}` as `credential.json`')
     except Exception as e:
         print(f'error: {e}')
